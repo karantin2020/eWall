@@ -6,12 +6,14 @@
     "flow-bin": "^0.77.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "react-intl": "^2.4.0",
     "react-loadable": "^5.4.0",
+    "react-notification-system": "^0.2.17",
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
     "semantic-ui-css": "^2.3.3",
     "semantic-ui-react": "^0.82.1",
-    "serve": "^9.4.0"
+    "validator": "^10.5.0"
   },
   "scripts": {
     "start": "react-scripts start",
