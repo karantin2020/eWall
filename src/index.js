@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-
 // Don't import the whole css import only needed components
 import 'semantic-ui-css/semantic.min.css';
 
@@ -24,9 +24,15 @@ import 'semantic-ui-css/semantic.min.css';
 // import 'semantic-ui-css/components/sidebar.css'
 // import 'semantic-ui-css/components/site.css'
 
+import store from './store.js';
 import './index.css';
 import getLocalData from './i18n/index.js';
 
 getLocalData('ru');
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
 registerServiceWorker();

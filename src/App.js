@@ -1,31 +1,16 @@
 import React, { PureComponent } from 'react';
+// import { connect } from 'react-redux';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Grid } from 'semantic-ui-react';
-import NotificationSystem from 'react-notification-system';
+import NotificationsSystem from 'reapop';
+import theme from 'reapop-theme-wybo';
 import Login from './Views/Login.js';
 import Signup from './Views/Signup.js';
 import Restore from './Views/Restore.js';
 import Home from './Views/Home.js';
+// import { store } from './index.js';
 
 class AppLayout extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.notificationSystem = null;
-    // create a ref to store the textInput DOM element
-    this.notificationSystem = React.createRef();
-    this.addNotification = this.addNotification.bind(this);
-  }
-
-  addNotification = event => {
-    event.preventDefault();
-    this.notificationSystem.current.addNotification({
-      message: 'Notification message',
-      level: 'success'
-    });
-  };
-  // componentDidMount: function() {
-  //   this.notificationSystem = this.refs.notificationSystem;
-  // }
   render() {
     return (
       <Router>
@@ -37,7 +22,7 @@ class AppLayout extends PureComponent {
             <Route exact path="/restore" component={Restore} />
             <Route exact path="/:user" component={User} />
           </Switch>
-          <NotificationSystem ref={this.notificationSystem} />
+          <NotificationsSystem theme={theme}/>
         </Grid>
       </Router>
     );
@@ -58,4 +43,10 @@ const User = ({ match }) => (
   </div>
 );
 
-export default AppLayout;
+// const mapStateToProps = state => {
+//   console.log('Recieved new state: ', state);
+//   return {};
+// };
+
+// export default connect(mapStateToProps)(AppLayout);
+export default AppLayout

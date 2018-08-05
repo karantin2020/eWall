@@ -73,6 +73,7 @@ class DesktopContainer extends Component {
         >
           <Segment
             inverted
+            color="grey"
             textAlign="center"
             style={{ minHeight: 700, padding: '1em 0em' }}
             vertical
@@ -92,13 +93,14 @@ class DesktopContainer extends Component {
                 <Menu.Item as="a">Company</Menu.Item>
                 <Menu.Item as="a">Careers</Menu.Item>
                 <Menu.Item position="right">
-                  <Button as={Link} to="/login" inverted={!fixed}>
+                  <Button as={Link} to="/login" inverted={!fixed} color="grey">
                     Log in
                   </Button>
                   <Button
                     as={Link}
                     to="/signup"
                     inverted={!fixed}
+                    color="grey"
                     primary={fixed}
                     style={{ marginLeft: '0.5em' }}
                   >
@@ -149,8 +151,12 @@ class MobileContainer extends Component {
             <Menu.Item as="a">Work</Menu.Item>
             <Menu.Item as="a">Company</Menu.Item>
             <Menu.Item as="a">Careers</Menu.Item>
-            <Menu.Item as="Link" to="/login">Log in</Menu.Item>
-            <Menu.Item as="Link" to="/signup">Sign Up</Menu.Item>
+            <Menu.Item as="Link" to="/login">
+              Log in
+            </Menu.Item>
+            <Menu.Item as="Link" to="/signup">
+              Sign Up
+            </Menu.Item>
           </Sidebar>
 
           <Sidebar.Pusher
