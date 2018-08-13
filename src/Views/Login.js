@@ -20,6 +20,10 @@ import toFrom from '../utils/toFrom.js';
 let strongRegex = new RegExp(
   '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@-_+,.<>)(#$%^&*])(?=.{8,})'
 );
+let defaultMsgConfig = {
+  dismissible: true,
+  dismissAfter: 5000
+};
 
 class LoginForm extends PureComponent {
   constructor(props) {
@@ -31,6 +35,29 @@ class LoginForm extends PureComponent {
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
+  }
+  handleKeyPress(event, data) {
+    if (event.key === 'Enter') {
+      const ok = this.handleInputChange(event, data);
+      if (ok) {
+        notify({
+          ...defaultMsgConfig,
+          id: 'loginFormSuccess',
+          title: 'Welcome',
+          status: 'success'
+        });
+        return toFrom(this.props.history)();
+      } else {
+        notify({
+          ...defaultMsgConfig,
+          id: 'loginFormError',
+          message: 'Incorrect form field values',
+          status: 'error'
+        });
+      }
+      this.handleSubmit(event);
+    }
   }
   verifyFields() {
     if (
@@ -60,7 +87,7 @@ class LoginForm extends PureComponent {
     const { notify } = this.props;
     var value = target.value;
     if (value === undefined && data === undefined) {
-      return;
+      return false;
     }
     // value = value || data.checked;
     const name = target.name || data.name;
@@ -70,13 +97,12 @@ class LoginForm extends PureComponent {
       });
       // 3. we use `notify` to create a notification
       notify({
+        ...defaultMsgConfig,
         id: 'idError',
         message: 'Invalid userID field value',
-        status: 'error',
-        dismissible: true,
-        dismissAfter: 5000
+        status: 'error'
       });
-      return;
+      return false;
     } else {
       this.setState({
         userIDError: false
@@ -87,13 +113,12 @@ class LoginForm extends PureComponent {
         passwordError: true
       });
       notify({
+        ...defaultMsgConfig,
         id: 'passError',
         message: 'Invalid password field value',
-        status: 'error',
-        dismissible: true,
-        dismissAfter: 5000
+        status: 'error'
       });
-      return;
+      return false;
     } else {
       this.setState({
         passwordError: false
@@ -102,19 +127,26 @@ class LoginForm extends PureComponent {
     this.setState({
       [name]: value
     });
+    return true;
   }
   handleSubmit(event) {
     const { notify } = this.props;
     event.preventDefault();
     if (this.verifyFields()) {
-      toFrom(this.props.history)();
+      console.log("loginFormSuccess")
+      notify({
+        ...defaultMsgConfig,
+        id: 'loginFormSuccess',
+        title: 'Welcome',
+        status: 'success'
+      });
+      return toFrom(this.props.history)();
     } else {
       notify({
+        ...defaultMsgConfig,
         id: 'loginFormError',
         message: 'Incorrect form field values',
-        status: 'error',
-        dismissible: true,
-        dismissAfter: 5000
+        status: 'error'
       });
     }
   }
@@ -132,10 +164,10 @@ class LoginForm extends PureComponent {
               icon="user"
               iconPosition="left"
               placeholder="Your ID"
+              type="text"
               name="userID"
               onBlur={this.handleInputChange}
               tabIndex={1}
-              focus
               autoFocus
             />
           </Form.Field>
@@ -148,6 +180,7 @@ class LoginForm extends PureComponent {
               type="password"
               name="password"
               onBlur={this.handleInputChange}
+              onKeyPress={this.handleKeyPress}
               tabIndex={2}
             />
           </Form.Field>

@@ -4,7 +4,6 @@ function toFrom(history) {
     from = '/';
   }
   return () => {
-    console.log("Go to ", from)
     history.replace(from);
   }
 }
