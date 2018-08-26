@@ -91,38 +91,42 @@ class LoginForm extends PureComponent {
     }
     // value = value || data.checked;
     const name = target.name || data.name;
-    if (name === 'userID' && !this.verifyUserID(value)) {
-      this.setState({
-        userIDError: true
-      });
-      // 3. we use `notify` to create a notification
-      notify({
-        ...defaultMsgConfig,
-        id: 'idError',
-        message: 'Invalid userID field value',
-        status: 'error'
-      });
-      return false;
-    } else {
-      this.setState({
-        userIDError: false
-      });
+    if (name === 'userID') {
+      if (!this.verifyUserID(value)) {
+        this.setState({
+          userIDError: true
+        });
+        // 3. we use `notify` to create a notification
+        notify({
+          ...defaultMsgConfig,
+          id: 'idError',
+          message: 'Invalid userID field value',
+          status: 'error'
+        });
+        return false;
+      } else {
+        this.setState({
+          userIDError: false
+        });
+      }
     }
-    if (name === 'password' && !this.verifyPassword(value)) {
-      this.setState({
-        passwordError: true
-      });
-      notify({
-        ...defaultMsgConfig,
-        id: 'passError',
-        message: 'Invalid password field value',
-        status: 'error'
-      });
-      return false;
-    } else {
-      this.setState({
-        passwordError: false
-      });
+    if (name === 'password') {
+      if (!this.verifyPassword(value)) {
+        this.setState({
+          passwordError: true
+        });
+        notify({
+          ...defaultMsgConfig,
+          id: 'passError',
+          message: 'Invalid password field value',
+          status: 'error'
+        });
+        return false;
+      } else {
+        this.setState({
+          passwordError: false
+        });
+      }
     }
     this.setState({
       [name]: value
@@ -133,7 +137,7 @@ class LoginForm extends PureComponent {
     const { notify } = this.props;
     event.preventDefault();
     if (this.verifyFields()) {
-      console.log("loginFormSuccess")
+      console.log('loginFormSuccess');
       notify({
         ...defaultMsgConfig,
         id: 'loginFormSuccess',
@@ -199,7 +203,14 @@ class LoginForm extends PureComponent {
             </List.Item>
           </List>
 
-          <Button tabIndex={4} primary fluid size="large" type="submit">
+          <Button
+            tabIndex={4}
+            primary
+            fluid
+            size="large"
+            type="submit"
+            disabled={this.state.userIDError || this.state.passwordError}
+          >
             Login
           </Button>
         </Container>
@@ -210,7 +221,8 @@ class LoginForm extends PureComponent {
 
 const LoginMessage = () => (
   <Message size="tiny">
-    Are you new here?{'   '}
+    Are you new here?
+    {'   '}
     <Link to="/signup">Sign up</Link>
   </Message>
 );

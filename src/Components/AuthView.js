@@ -51,7 +51,14 @@ class AuthView extends PureComponent {
   };
 
   render() {
-    const { AuthMessage, children, title, className, onSubmit, action } = this.props;
+    const {
+      AuthMessage,
+      children,
+      title,
+      className,
+      onSubmit,
+      action
+    } = this.props;
     return (
       <Grid.Row centered style={{ margin: '0' }} className={className}>
         <Grid.Column
@@ -62,8 +69,8 @@ class AuthView extends PureComponent {
           verticalAlign="middle"
         >
           <Header as="h2" color="teal" textAlign="center">
-            <Header.Subheader style={{paddingBottom: "1.5em"}}>
-              <Image src={logo} size="tiny" as={Link} to="/" />
+            <Header.Subheader style={{ paddingBottom: '1.5em' }}>
+              <Image src={logo} size="tiny" as={Link} tabIndex={-1} to="/" />
             </Header.Subheader>
             {title}
           </Header>

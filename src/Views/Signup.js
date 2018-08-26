@@ -43,17 +43,6 @@ const SignupForm = props => {
           />
         </Form.Field>
 
-        <List
-          floated="right"
-          horizontal
-          size="small"
-          style={{ margin: '-0.5em 0 0.7em 0' }}
-        >
-          <List.Item as={Link} to="/restore">
-            Forgot password?
-          </List.Item>
-        </List>
-
         <Button type="submit" primary fluid size="large">
           Sign up
         </Button>

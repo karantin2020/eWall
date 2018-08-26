@@ -22,21 +22,13 @@ class AppLayout extends PureComponent {
             <Route exact path="/restore" component={Restore} />
             <Route exact path="/:user" component={User} />
           </Switch>
-          <NotificationsSystem theme={theme}/>
+          <NotificationsSystem theme={theme} />
         </Grid>
       </Router>
     );
   }
 }
 
-// const Home = () => (
-//   <div>
-//     <h2>Home</h2>
-//     <div>
-//       <Link to="/login">Login</Link>
-//     </div>
-//   </div>
-// );
 const User = ({ match }) => (
   <div>
     <h2>User: {match.params.user}</h2>
@@ -49,4 +41,4 @@ const User = ({ match }) => (
 // };
 
 // export default connect(mapStateToProps)(AppLayout);
-export default AppLayout
+export default AppLayout;
