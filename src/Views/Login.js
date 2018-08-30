@@ -8,7 +8,8 @@ import {
   Input,
   Message,
   List,
-  Checkbox
+  Checkbox,
+  Popup
 } from 'semantic-ui-react';
 import { notify, removeNotification } from 'reapop';
 import isEmail from 'validator/lib/isEmail';
@@ -61,8 +62,7 @@ class LoginForm extends PureComponent {
         ...defaultMsgConfig,
         id: 'loginUserIDError',
         title: 'UserID is invalid',
-        message:
-          'UserID must be email or string with length more than 3 letters',
+        message: 'Need valid email',
         status: 'error'
       });
       correct = false;
@@ -78,7 +78,7 @@ class LoginForm extends PureComponent {
         id: 'loginPasswordError',
         title: 'Password is invalid',
         message:
-          'Password must be with length more than 8, must contain lower-case. upper-case letters, digits and special characters',
+          'Password must contain at least 8 lower-case and upper-case letters, digits and special characters',
         status: 'error'
       });
       correct = false;
@@ -88,13 +88,11 @@ class LoginForm extends PureComponent {
     return correct;
   }
   verifyUserID(userID) {
-    if (userID && (isEmail(userID) || isLength(userID, { min: 3, max: 64 })))
-      return true;
+    if (isEmail(userID)) return true;
     return false;
   }
   verifyPassword(password) {
     if (
-      password &&
       matches(password, strongRegex) &&
       isLength(password, { min: 8, max: 64 })
     )
@@ -102,6 +100,7 @@ class LoginForm extends PureComponent {
     return false;
   }
   handleInputChange = (event, { name, value }) => {
+    let { removeNotification } = this.props;
     this.setState((prevState, props) => ({
       ['error' + name]: false
     }));
@@ -115,6 +114,7 @@ class LoginForm extends PureComponent {
         this.setState({
           userIDError: false
         });
+        removeNotification('loginUserIDError');
       }
     }
     if (name === 'password') {
@@ -127,6 +127,7 @@ class LoginForm extends PureComponent {
         this.setState({
           passwordError: false
         });
+        removeNotification('loginPasswordError');
       }
     }
     return true;
@@ -174,8 +175,8 @@ class LoginForm extends PureComponent {
               fluid
               icon="user"
               iconPosition="left"
-              placeholder="Your ID"
-              type="text"
+              placeholder="Your email"
+              type="email"
               name="userID"
               ref={this.userIDRef}
               onChange={this.handleInputChange}
@@ -184,6 +185,13 @@ class LoginForm extends PureComponent {
               autoFocus
             />
           </Form.Field>
+          <Popup
+            context={this.userIDNode}
+            style={{ padding: '0.5em 0.7em' }}
+            content="Need valid email"
+            position="bottom left"
+            open={this.state.erroruserID}
+          />
           <Form.Field error={this.state.errorpassword}>
             <Input
               fluid
@@ -198,7 +206,13 @@ class LoginForm extends PureComponent {
               tabIndex={2}
             />
           </Form.Field>
-
+          <Popup
+            context={this.passwordNode}
+            style={{ padding: '0.5em 0.7em' }}
+            content="min 8 letters, numberes, characters"
+            position="bottom left"
+            open={this.state.errorpassword}
+          />
           <List horizontal size="small" style={{ margin: '-0.5em 0 0.7em 0' }}>
             <Checkbox
               as={List.Item}
