@@ -1,13 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Container,
-  Button,
-  Form,
-  Input,
-  List,
-  Message
-} from 'semantic-ui-react';
+import { Container, Button, Form, Input, Message } from 'semantic-ui-react';
 import AuthView from '../Components/AuthView.js';
 import toFrom from '../utils/toFrom.js';
 

@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions';
 import { bindActionCreators } from 'redux';
+import Immutable, { isImmutable } from 'immutable';
 
 const generateActions = (keyPath, dispatcher) => {
   // console.log("Start genAction");

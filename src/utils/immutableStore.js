@@ -3,13 +3,13 @@ import { combineReducers, createStore, applyMiddleware } from 'redux';
 
 import thunk from 'redux-thunk';
 
-export function flatReducer (state = Immutable.Map({}), action) {
+export let flatReducer = (state = Immutable.Map({}), action) => {
   if (action && action.error) {
     return state;
   } else {
-    const payload = action.payload;
-    const keyPath = action.meta && action.meta.path;
-    const method = action.type;
+    let payload = action.payload;
+    let keyPath = action.meta && action.meta.path;
+    let method = action.type;
     if (payload && keyPath && method) {
       return state[method] && state[method](keyPath, payload);
     } else if (method === 'deleteIn') {
@@ -25,7 +25,7 @@ export function flatReducer (state = Immutable.Map({}), action) {
   }
 };
 
-// const logger = store => next => action => {
+// let logger = store => next => action => {
 //   console.log(action.type);
 //   console.log('dispatching', store.getState());
 //   let result = next(action);
@@ -34,32 +34,32 @@ export function flatReducer (state = Immutable.Map({}), action) {
 //   return result;
 // };
 
-const createStoreWithMiddleware = applyMiddleware(
+let createStoreWithMiddleware = applyMiddleware(
   thunk
   // logger
 )(createStore);
 
-const flat_store = function(flatState) {
-  return createStoreWithMiddleware(flatReducer, flatState);
+export let handleStore = (store, path) => {
+  return () =>
+    store
+      .getState()
+      .getIn(path)
+      .toJS();
 };
 
-export function flatReducers(reducers, flatState) {
-  var keys = Object.keys(reducers)
-  var store = {}
-  for (var i =0; i < keys.length; i++) {
-    store[keys[i]] = reducers[keys[i]]
-  }
-  store["flatReducer"] = flatState
+export let flatReducers = function(reducers, api_state) {
   return createStoreWithMiddleware(
-    combineReducers({ ...reducers, flatReducer })
+    combineReducers({ flatReducer, ...reducers }),
+    api_state
   );
-}
+};
 
-export default flat_store;
+let flatStore = function(api_state) {
+  let state = api_state;
+  if (!Immutable.isImmutable(api_state)) {
+    state = Immutable.fromJS(api_state);
+  }
+  return createStoreWithMiddleware(flatReducer, state);
+};
 
-/* TESTS */
-/*
-
-
-*/
-/* TESTS END */
+export default flatStore;

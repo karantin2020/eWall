@@ -4,10 +4,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Grid } from 'semantic-ui-react';
 import NotificationsSystem from 'reapop';
 import theme from 'reapop-theme-wybo';
-import Login from './Views/Login.js';
-import Signup from './Views/Signup.js';
-import Restore from './Views/Restore.js';
 import Home from './Views/Home.js';
+import AuthViews from './Views/AuthViews.js';
 // import { store } from './index.js';
 
 class AppLayout extends PureComponent {
@@ -17,10 +15,12 @@ class AppLayout extends PureComponent {
         <Grid style={{ height: '100vh', width: '100vw', margin: '0' }}>
           <Switch>
             <Route exact path="/" component={Home} />
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/signup" component={Signup} />
-            <Route exact path="/restore" component={Restore} />
-            <Route exact path="/:user" component={User} />
+            <Route
+              exact
+              path="/:authView(login|signup|restore)"
+              component={AuthViews}
+            />
+            <Route path="/:user" component={User} />
           </Switch>
           <NotificationsSystem theme={theme} />
         </Grid>

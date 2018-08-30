@@ -12,7 +12,7 @@ export default createStoreWithMiddleware(
     notifications: notificationsReducer(),
     flatReducer
   }),
-  {flatReducer:store}
+  { flatReducer: store }
 );
 
 // export default flatReducers(

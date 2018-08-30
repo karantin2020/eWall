@@ -10,7 +10,7 @@ import {
   List,
   Checkbox
 } from 'semantic-ui-react';
-import { notify } from 'reapop';
+import { notify, removeNotification } from 'reapop';
 import isEmail from 'validator/lib/isEmail';
 import isLength from 'validator/lib/isLength';
 import matches from 'validator/lib/matches';
@@ -18,11 +18,11 @@ import AuthView from '../Components/AuthView.js';
 import toFrom from '../utils/toFrom.js';
 
 let strongRegex = new RegExp(
-  '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@-_+,.<>)(#$%^&*])(?=.{8,})'
+  '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*<>?])(?=.{8,})'
 );
 let defaultMsgConfig = {
   dismissible: true,
-  dismissAfter: 5000
+  dismissAfter: 0
 };
 
 class LoginForm extends PureComponent {
@@ -30,43 +30,62 @@ class LoginForm extends PureComponent {
     super(props);
     this.state = {
       rememberMe: true,
-      userIDError: false,
-      passwordError: false
+      userIDError: true,
+      passwordError: true,
+      erroruserID: false,
+      errorpassword: false
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.userIDRef = React.createRef();
+    this.passwordRef = React.createRef();
   }
-  handleKeyPress(event, data) {
+  componentDidMount = () => {
+    this.userIDNode = this.userIDRef.current.inputRef;
+    this.passwordNode = this.passwordRef.current.inputRef;
+  };
+  handleKeyPress(event) {
     if (event.key === 'Enter') {
-      const ok = this.handleInputChange(event, data);
-      if (ok) {
-        notify({
-          ...defaultMsgConfig,
-          id: 'loginFormSuccess',
-          title: 'Welcome',
-          status: 'success'
-        });
-        return toFrom(this.props.history)();
-      } else {
-        notify({
-          ...defaultMsgConfig,
-          id: 'loginFormError',
-          message: 'Incorrect form field values',
-          status: 'error'
-        });
-      }
-      this.handleSubmit(event);
+      return this.handleSubmit(event);
     }
   }
   verifyFields() {
-    if (
-      !this.verifyUserID(this.state.useID) &&
-      !this.verifyPassword(this.state.password)
-    ) {
-      return false;
+    var correct = true;
+    let { notify, removeNotification } = this.props;
+    if (this.state.userIDError) {
+      this.setState((prevState, props) => ({
+        erroruserID: true
+      }));
+      notify({
+        ...defaultMsgConfig,
+        id: 'loginUserIDError',
+        title: 'UserID is invalid',
+        message:
+          'UserID must be email or string with length more than 3 letters',
+        status: 'error'
+      });
+      correct = false;
+    } else {
+      removeNotification('loginUserIDError');
     }
-    return true;
+    if (this.state.passwordError) {
+      this.setState((prevState, props) => ({
+        errorpassword: true
+      }));
+      notify({
+        ...defaultMsgConfig,
+        id: 'loginPasswordError',
+        title: 'Password is invalid',
+        message:
+          'Password must be with length more than 8, must contain lower-case. upper-case letters, digits and special characters',
+        status: 'error'
+      });
+      correct = false;
+    } else {
+      removeNotification('loginPasswordError');
+    }
+    return correct;
   }
   verifyUserID(userID) {
     if (userID && (isEmail(userID) || isLength(userID, { min: 3, max: 64 })))
@@ -82,26 +101,14 @@ class LoginForm extends PureComponent {
       return true;
     return false;
   }
-  handleInputChange(event, data) {
-    const target = event.target;
-    const { notify } = this.props;
-    var value = target.value;
-    if (value === undefined && data === undefined) {
-      return false;
-    }
-    // value = value || data.checked;
-    const name = target.name || data.name;
+  handleInputChange = (event, { name, value }) => {
+    this.setState((prevState, props) => ({
+      ['error' + name]: false
+    }));
     if (name === 'userID') {
       if (!this.verifyUserID(value)) {
         this.setState({
           userIDError: true
-        });
-        // 3. we use `notify` to create a notification
-        notify({
-          ...defaultMsgConfig,
-          id: 'idError',
-          message: 'Invalid userID field value',
-          status: 'error'
         });
         return false;
       } else {
@@ -115,12 +122,6 @@ class LoginForm extends PureComponent {
         this.setState({
           passwordError: true
         });
-        notify({
-          ...defaultMsgConfig,
-          id: 'passError',
-          message: 'Invalid password field value',
-          status: 'error'
-        });
         return false;
       } else {
         this.setState({
@@ -128,30 +129,36 @@ class LoginForm extends PureComponent {
         });
       }
     }
-    this.setState({
-      [name]: value
-    });
     return true;
-  }
+  };
+  handleEdit = (event, { name, value }) => {
+    if (value === undefined) {
+      return false;
+    }
+    if (name === 'userID') {
+      this.setState({
+        userIDError: false
+      });
+    }
+    if (name === 'password') {
+      this.setState({
+        passwordError: false
+      });
+    }
+  };
   handleSubmit(event) {
-    const { notify } = this.props;
     event.preventDefault();
     if (this.verifyFields()) {
-      console.log('loginFormSuccess');
+      let { notify } = this.props;
       notify({
         ...defaultMsgConfig,
-        id: 'loginFormSuccess',
+        id: 'loginSuccess',
         title: 'Welcome',
+        message: 'Now you can start work',
+        dismissAfter: 7000,
         status: 'success'
       });
       return toFrom(this.props.history)();
-    } else {
-      notify({
-        ...defaultMsgConfig,
-        id: 'loginFormError',
-        message: 'Incorrect form field values',
-        status: 'error'
-      });
     }
   }
   render() {
@@ -162,7 +169,7 @@ class LoginForm extends PureComponent {
         onSubmit={this.handleSubmit}
       >
         <Container>
-          <Form.Field error={this.state.userIDError}>
+          <Form.Field error={this.state.erroruserID}>
             <Input
               fluid
               icon="user"
@@ -170,12 +177,14 @@ class LoginForm extends PureComponent {
               placeholder="Your ID"
               type="text"
               name="userID"
-              onBlur={this.handleInputChange}
+              ref={this.userIDRef}
+              onChange={this.handleInputChange}
+              onKeyPress={this.handleKeyPress}
               tabIndex={1}
               autoFocus
             />
           </Form.Field>
-          <Form.Field error={this.state.passwordError}>
+          <Form.Field error={this.state.errorpassword}>
             <Input
               fluid
               icon="lock"
@@ -183,7 +192,8 @@ class LoginForm extends PureComponent {
               placeholder="Password"
               type="password"
               name="password"
-              onBlur={this.handleInputChange}
+              ref={this.passwordRef}
+              onChange={this.handleInputChange}
               onKeyPress={this.handleKeyPress}
               tabIndex={2}
             />
@@ -219,7 +229,7 @@ class LoginForm extends PureComponent {
   }
 }
 
-const LoginMessage = () => (
+let LoginMessage = () => (
   <Message size="tiny">
     Are you new here?
     {'   '}
@@ -229,6 +239,6 @@ const LoginMessage = () => (
 
 export default connect(
   null,
-  { notify }
+  { notify, removeNotification }
 )(LoginForm);
 // export default LoginForm;
