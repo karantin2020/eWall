@@ -69,22 +69,6 @@ class LoginForm extends PureComponent {
     } else {
       removeNotification('loginUserIDError');
     }
-    if (this.state.passwordError) {
-      this.setState((prevState, props) => ({
-        errorpassword: true
-      }));
-      notify({
-        ...defaultMsgConfig,
-        id: 'loginPasswordError',
-        title: 'Password is invalid',
-        message:
-          'Password must contain at least 8 lower-case and upper-case letters, digits and special characters',
-        status: 'error'
-      });
-      correct = false;
-    } else {
-      removeNotification('loginPasswordError');
-    }
     return correct;
   }
   verifyUserID(userID) {
@@ -117,19 +101,6 @@ class LoginForm extends PureComponent {
         removeNotification('loginUserIDError');
       }
     }
-    if (name === 'password') {
-      if (!this.verifyPassword(value)) {
-        this.setState({
-          passwordError: true
-        });
-        return false;
-      } else {
-        this.setState({
-          passwordError: false
-        });
-        removeNotification('loginPasswordError');
-      }
-    }
     return true;
   };
   handleEdit = (event, { name, value }) => {
@@ -149,18 +120,30 @@ class LoginForm extends PureComponent {
   };
   handleSubmit(event) {
     event.preventDefault();
-    if (this.verifyFields()) {
-      let { notify } = this.props;
+    if (!this.verifyFields()) {
+      return;
+    }
+    let { notify } = this.props;
+    if (!true /*authenticate()*/) {
       notify({
         ...defaultMsgConfig,
-        id: 'loginSuccess',
-        title: 'Welcome',
-        message: 'Now you can start work',
+        id: 'loginAuthError',
+        title: 'Bad credentials',
+        message: 'Your email or password is invalid',
         dismissAfter: 7000,
-        status: 'success'
+        status: 'error'
       });
-      return toFrom(this.props.history)();
+      return;
     }
+    notify({
+      ...defaultMsgConfig,
+      id: 'loginSuccess',
+      title: 'Welcome',
+      message: 'Now you can start work',
+      dismissAfter: 7000,
+      status: 'success'
+    });
+    return toFrom(this.props.history)();
   }
   render() {
     return (
@@ -192,7 +175,7 @@ class LoginForm extends PureComponent {
             position="bottom left"
             open={this.state.erroruserID}
           />
-          <Form.Field error={this.state.errorpassword}>
+          <Form.Field>
             <Input
               fluid
               icon="lock"
@@ -206,13 +189,6 @@ class LoginForm extends PureComponent {
               tabIndex={2}
             />
           </Form.Field>
-          <Popup
-            context={this.passwordNode}
-            style={{ padding: '0.5em 0.7em' }}
-            content="min 8 letters, numberes, characters"
-            position="bottom left"
-            open={this.state.errorpassword}
-          />
           <List horizontal size="small" style={{ margin: '-0.5em 0 0.7em 0' }}>
             <Checkbox
               as={List.Item}
@@ -233,7 +209,7 @@ class LoginForm extends PureComponent {
             fluid
             size="large"
             type="submit"
-            disabled={this.state.userIDError || this.state.passwordError}
+            disabled={this.state.userIDError}
           >
             Login
           </Button>
